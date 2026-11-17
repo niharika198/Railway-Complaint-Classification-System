@@ -1,0 +1,38 @@
+
+# Node.js
+node_modules/
+frontend/dist/
+backend/node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model and dataset files
+*.h5
+*.joblib
+*.pt
+*.pth
+*.onnx
+
+# Operating system
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# IDE
+.vscode/
