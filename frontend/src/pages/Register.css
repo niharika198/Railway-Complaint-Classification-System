@@ -1,0 +1,473 @@
+/* ==============================
+   REGISTER PAGE
+================================ */
+
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5faff;
+  font-family: inherit;
+}
+
+.register-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==============================
+   HERO SECTION
+================================ */
+
+.register-hero {
+  min-height: 230px;
+  display: flex;
+  align-items: center;
+  padding: 35px 4.5%;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(237, 247, 255, 0.98) 0%,
+      rgba(237, 247, 255, 0.93) 32%,
+      rgba(237, 247, 255, 0.25) 58%,
+      rgba(237, 247, 255, 0) 100%
+    ),
+    url("/train-hero.jpeg");
+
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.register-hero-content {
+  max-width: 520px;
+}
+
+.register-hero-label {
+  color: #0865c9;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+.register-hero h1 {
+  color: #092e60;
+  font-size: clamp(32px, 4vw, 46px);
+  font-weight: 800;
+  margin: 0 0 12px;
+}
+
+.register-hero h1 span {
+  color: #0875ed;
+}
+
+.register-hero-description {
+  color: #405c7d;
+  font-size: 16px;
+  line-height: 1.7;
+  max-width: 440px;
+  margin: 0;
+}
+
+/* ==============================
+   MAIN CONTENT
+================================ */
+
+.register-content {
+  width: 100%;
+  max-width: 1220px;
+  margin: 25px auto 35px;
+  padding: 0 18px;
+  display: grid;
+  grid-template-columns: 1.55fr 0.95fr;
+  gap: 18px;
+  align-items: stretch;
+}
+
+/* ==============================
+   REGISTER CARD
+================================ */
+
+.register-card {
+  background: #ffffff;
+  border: 1px solid #e2edf8;
+  border-radius: 13px;
+  padding: 25px 26px;
+  box-shadow: 0 5px 18px rgba(18, 65, 112, 0.06);
+}
+
+.register-heading {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.register-heading-icon {
+  width: 68px;
+  height: 68px;
+  min-width: 68px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e4f1ff;
+  color: #0873df;
+}
+
+.register-heading h2 {
+  font-size: 27px;
+  color: #092e60;
+  margin: 0 0 4px;
+}
+
+.register-heading p {
+  color: #657d9b;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ==============================
+   FORM GRID
+================================ */
+
+.register-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 19px 24px;
+}
+
+.register-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.register-field label {
+  color: #405a78;
+  font-size: 13px;
+  margin-bottom: 7px;
+  font-weight: 500;
+}
+
+.register-field label span {
+  color: #dc4141;
+}
+
+/* INPUTS */
+
+.register-input-wrapper {
+  height: 43px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 11px;
+  border: 1px solid #d9e5f1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #52718f;
+  transition: 0.2s ease;
+}
+
+.register-input-wrapper:focus-within {
+  border-color: #1680e8;
+  box-shadow: 0 0 0 3px rgba(22, 128, 232, 0.09);
+}
+
+.register-input-wrapper > svg {
+  flex-shrink: 0;
+}
+
+.register-input-wrapper input,
+.register-input-wrapper select {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #244365;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.register-input-wrapper input::placeholder {
+  color: #99a9ba;
+}
+
+.register-input-wrapper select {
+  cursor: pointer;
+}
+
+.register-input-wrapper select:invalid {
+  color: #99a9ba;
+}
+
+/* PASSWORD TOGGLE */
+
+.password-toggle {
+  border: none;
+  background: transparent;
+  color: #617b98;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.password-toggle:hover {
+  color: #0875ed;
+}
+
+/* USER TYPE */
+
+.user-type-field {
+  margin-top: 19px;
+}
+
+/* ==============================
+   TERMS
+================================ */
+
+.register-terms {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0;
+  color: #536b89;
+  font-size: 12px;
+}
+
+.register-terms input {
+  width: 15px;
+  height: 15px;
+  accent-color: #0867ce;
+  cursor: pointer;
+}
+
+.register-terms label {
+  cursor: pointer;
+}
+
+.register-terms a {
+  color: #0872d9;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-terms a:hover {
+  text-decoration: underline;
+}
+
+/* ==============================
+   REGISTER BUTTON
+================================ */
+
+.register-submit-btn {
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: 6px;
+  background: #092f64;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.register-submit-btn:hover {
+  background: #0753a5;
+  transform: translateY(-1px);
+}
+
+/* LOGIN LINK */
+
+.register-login-text {
+  text-align: center;
+  font-size: 13px;
+  color: #71839a;
+  margin: 18px 0 0;
+}
+
+.register-login-text a {
+  color: #0871d9;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.register-login-text a:hover {
+  text-decoration: underline;
+}
+
+/* ==============================
+   WHY REGISTER PANEL
+================================ */
+
+.register-benefits {
+  position: relative;
+  overflow: hidden;
+  background: #edf6ff;
+  border: 1px solid #e0edf9;
+  border-radius: 13px;
+  padding: 27px 25px;
+  min-height: 480px;
+  box-sizing: border-box;
+}
+
+.benefits-heading {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 23px;
+}
+
+.benefits-heading h2 {
+  font-size: 23px;
+  color: #092f64;
+  margin: 0 0 5px;
+}
+
+.benefits-heading p {
+  color: #58708e;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.benefits-list {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.benefit-icon {
+  width: 59px;
+  height: 59px;
+  min-width: 59px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background: #dceeff;
+  color: #0863c8;
+}
+
+.benefit-text h3 {
+  color: #12345d;
+  font-size: 14px;
+  margin: 5px 0 5px;
+}
+
+.benefit-text p {
+  color: #5c7390;
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 230px;
+}
+
+/* BOTTOM TRAIN DECORATION */
+
+.benefits-train-image {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 125px;
+  background-image: url("/train-banner.jpg");
+  background-size: cover;
+  background-position: center bottom;
+  opacity: 0.18;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent, black 55%);
+}
+
+/* ==============================
+   RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 900px) {
+  .register-content {
+    grid-template-columns: 1fr;
+    max-width: 700px;
+  }
+
+  .register-benefits {
+    min-height: 430px;
+  }
+
+  .register-hero {
+    min-height: 210px;
+  }
+}
+
+@media (max-width: 600px) {
+  .register-hero {
+    min-height: 200px;
+    padding: 28px 20px;
+    background-position: 65% center;
+  }
+
+  .register-hero h1 {
+    font-size: 31px;
+  }
+
+  .register-hero-description {
+    font-size: 14px;
+    max-width: 320px;
+  }
+
+  .register-content {
+    padding: 0 12px;
+    margin-top: 16px;
+  }
+
+  .register-card {
+    padding: 20px 16px;
+  }
+
+  .register-heading h2 {
+    font-size: 23px;
+  }
+
+  .register-heading-icon {
+    width: 55px;
+    height: 55px;
+    min-width: 55px;
+  }
+
+  .register-form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .register-benefits {
+    padding: 22px 18px;
+  }
+
+  .benefit-item {
+    gap: 13px;
+  }
+
+  .register-terms {
+    align-items: flex-start;
+    line-height: 1.6;
+  }
+}
