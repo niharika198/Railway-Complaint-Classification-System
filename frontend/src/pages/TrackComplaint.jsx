@@ -3,8 +3,6 @@ import {
   Search,
   Ticket,
   FileText,
-  ShieldCheck,
-  User,
   Settings,
   CheckCircle,
   Phone,
@@ -15,63 +13,108 @@ import {
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import api from "../services/api";
 
 import "./TrackComplaint.css";
 
 function TrackComplaint() {
   const [complaintId, setComplaintId] = useState("");
+  const [complaint, setComplaint] = useState(null);
+
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
-  const handleTrack = (e) => {
-    e.preventDefault();
-
-    if (!complaintId.trim()) {
-      setMessage("Please enter your complaint ID.");
-      return;
-    }
-
-    // Connect your backend tracking API here.
-    // Example: GET /api/complaints/:complaintId
-
-    setMessage(
-      "Complaint tracking API is not connected yet. Please connect your backend to retrieve the actual complaint status.",
-    );
-  };
+  const [loading, setLoading] = useState(false);
 
   const trackingStages = [
     {
       title: "Submitted",
-      date: "Complaint received",
+      description: "Complaint received",
       icon: <FileText size={26} />,
     },
     {
-      title: "In Review",
-      date: "Under verification",
-      icon: <ShieldCheck size={26} />,
-    },
-    {
-      title: "Assigned",
-      date: "Department assigned",
-      icon: <User size={26} />,
-    },
-    {
       title: "In Progress",
-      date: "Action in progress",
+      description: "Action in progress",
       icon: <Settings size={26} />,
     },
     {
       title: "Resolved",
-      date: "Issue resolved",
+      description: "Issue resolved",
       icon: <CheckCircle size={28} />,
     },
   ];
 
+  const statusOrder = {
+    Submitted: 0,
+    "In Progress": 1,
+    Resolved: 2,
+  };
+
+  const handleTrack = async (e) => {
+    e.preventDefault();
+
+    const enteredId = complaintId.trim();
+
+    if (!enteredId) {
+      setMessage("Please enter your complaint ID.");
+      setMessageType("error");
+      setComplaint(null);
+      return;
+    }
+
+    setLoading(true);
+    setComplaint(null);
+    setMessage("");
+    setMessageType("");
+
+    try {
+      const token =
+        localStorage.getItem("access_token") ||
+        sessionStorage.getItem("access_token");
+
+      if (!token) {
+        throw new Error("Please log in to track your complaint.");
+      }
+
+      const response = await api.get(
+        `/complaints/${encodeURIComponent(enteredId)}`,
+        token,
+      );
+
+      setComplaint(response.complaint);
+      setMessage("Complaint details retrieved successfully.");
+      setMessageType("success");
+    } catch (error) {
+      setComplaint(null);
+      setMessage(error.message || "Unable to retrieve complaint details.");
+      setMessageType("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+
+    return new Date(date).toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const currentStage = complaint ? statusOrder[complaint.status] : -1;
+
+  const statusClass = complaint
+    ? complaint.status.toLowerCase().replace(/\s+/g, "-")
+    : "";
+
   return (
     <div className="track-page">
-      {/* EXISTING NAVBAR */}
       <Navbar />
 
-      {/* HERO SECTION */}
       <section className="track-hero">
         <div className="track-hero-content">
           <span className="track-eyebrow">STAY INFORMED, STAY ASSURED</span>
@@ -88,11 +131,10 @@ function TrackComplaint() {
         </div>
       </section>
 
-      {/* MAIN CONTENT */}
       <main className="track-main">
-        {/* LEFT CONTENT */}
         <div className="track-left-content">
-          {/* SEARCH COMPLAINT */}
+          {/* COMPLAINT SEARCH */}
+
           <section className="track-search-card">
             <div className="track-search-icon">
               <Search size={38} />
@@ -102,8 +144,8 @@ function TrackComplaint() {
               <h2>Enter Your Complaint ID</h2>
 
               <p>
-                You can find your complaint ID in the confirmation message or
-                email you received.
+                Enter the complaint ID provided when you submitted your
+                complaint.
               </p>
 
               <form className="track-search-form" onSubmit={handleTrack}>
@@ -112,56 +154,133 @@ function TrackComplaint() {
 
                   <input
                     type="text"
-                    placeholder="e.g. RA-2025-001"
+                    placeholder="Enter your complaint ID"
                     value={complaintId}
                     onChange={(e) => {
                       setComplaintId(e.target.value);
                       setMessage("");
+                      setMessageType("");
+                      setComplaint(null);
                     }}
                     required
                   />
                 </div>
 
-                <button type="submit" className="track-button">
+                <button
+                  type="submit"
+                  className="track-button"
+                  disabled={loading}
+                >
                   <Search size={20} />
-                  Track Complaint
+
+                  {loading ? "Searching..." : "Track Complaint"}
                 </button>
               </form>
 
               {message && (
-                <p className="track-message" role="status">
+                <p
+                  className={`track-message track-${messageType}`}
+                  role="status"
+                >
                   {message}
                 </p>
               )}
             </div>
           </section>
 
-          {/* TRACKING TIMELINE */}
+          {/* COMPLAINT DETAILS */}
+
+          {complaint && (
+            <section className="track-result-card">
+              <div className="track-result-header">
+                <h2>Complaint Details</h2>
+
+                <span className={`track-result-status ${statusClass}`}>
+                  {complaint.status}
+                </span>
+              </div>
+
+              <div className="track-result-info">
+                <div className="track-result-item">
+                  <label>Complaint ID</label>
+                  <p>{complaint.id}</p>
+                </div>
+
+                <div className="track-result-item">
+                  <label>Submission Date</label>
+                  <p>{formatDate(complaint.created_at)}</p>
+                </div>
+
+                <div className="track-result-item">
+                  <label>Predicted Category</label>
+                  <p>{complaint.predicted_category}</p>
+                </div>
+
+                <div className="track-result-item">
+                  <label>Cluster ID</label>
+                  <p>{complaint.predicted_cluster}</p>
+                </div>
+              </div>
+
+              <div className="track-result-complaint">
+                <label>Submitted Complaint</label>
+                <p>{complaint.complaint_text}</p>
+              </div>
+            </section>
+          )}
+
+          {/* DYNAMIC TRACKING TIMELINE */}
+
           <section className="track-timeline-card">
-            <h2>Example: Complaint Tracking Journey</h2>
+            <h2>
+              {complaint
+                ? "Your Complaint Progress"
+                : "Complaint Tracking Journey"}
+            </h2>
 
             <div className="track-timeline">
-              {trackingStages.map((stage, index) => (
-                <div className="track-stage" key={stage.title}>
-                  <div
-                    className={`track-stage-icon ${
-                      index === 4 ? "track-resolved" : ""
-                    }`}
-                  >
-                    {stage.icon}
+              {trackingStages.map((stage, index) => {
+                const isCompleted = complaint && index < currentStage;
+
+                const isCurrent = complaint && index === currentStage;
+
+                return (
+                  <div className="track-stage" key={stage.title}>
+                    <div
+                      className={`track-stage-icon ${
+                        isCompleted ? "track-stage-completed" : ""
+                      } ${isCurrent ? "track-stage-current" : ""}`}
+                    >
+                      {stage.icon}
+                    </div>
+
+                    {index < trackingStages.length - 1 && (
+                      <div
+                        className={`track-stage-line ${
+                          complaint && index < currentStage
+                            ? "track-line-completed"
+                            : ""
+                        }`}
+                      ></div>
+                    )}
+
+                    <h3>{stage.title}</h3>
+
+                    <p>
+                      {isCurrent
+                        ? "Current status"
+                        : isCompleted
+                          ? "Completed"
+                          : stage.description}
+                    </p>
                   </div>
-
-                  <div className="track-stage-line"></div>
-
-                  <h3>{stage.title}</h3>
-
-                  <p>{stage.date}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
 
           {/* URGENT SUPPORT */}
+
           <section className="track-urgent-card">
             <div className="track-headset-icon">
               <Headphones size={34} />
@@ -183,7 +302,8 @@ function TrackComplaint() {
           </section>
         </div>
 
-        {/* RIGHT HELP PANEL */}
+        {/* HELP PANEL */}
+
         <aside className="track-help-panel">
           <div className="track-help-heading">
             <div className="track-help-main-icon">
@@ -199,7 +319,6 @@ function TrackComplaint() {
             </div>
           </div>
 
-          {/* CONTACT SUPPORT */}
           <div className="track-help-item">
             <div className="track-help-icon">
               <Phone size={27} />
@@ -217,7 +336,6 @@ function TrackComplaint() {
             </div>
           </div>
 
-          {/* EMAIL SUPPORT */}
           <div className="track-help-item">
             <div className="track-help-icon">
               <Mail size={27} />
@@ -237,7 +355,6 @@ function TrackComplaint() {
             </div>
           </div>
 
-          {/* FAQ */}
           <div className="track-help-item track-faq-item">
             <div className="track-help-icon">
               <HelpCircle size={28} />
@@ -254,7 +371,6 @@ function TrackComplaint() {
         </aside>
       </main>
 
-      {/* EXISTING FOOTER */}
       <Footer />
     </div>
   );

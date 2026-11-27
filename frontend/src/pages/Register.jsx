@@ -17,12 +17,14 @@ import {
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import api from "../services/api";
 
 import "./Register.css";
 
 function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -31,7 +33,7 @@ function Register() {
     pnr: "",
     password: "",
     confirmPassword: "",
-    userType: "",
+    userType: "Passenger",
     terms: false,
   });
 
@@ -44,7 +46,7 @@ function Register() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
@@ -62,12 +64,42 @@ function Register() {
       return;
     }
 
-    // Frontend validation completed.
-    // Connect your registration API here.
+    if (!/^[0-9]{10}$/.test(formData.pnr.trim())) {
+      alert("Please enter a valid 10-digit PNR number.");
+      return;
+    }
 
-    alert("Registration form submitted successfully!");
+    setIsLoading(true);
 
-    console.log("Registration Data:", formData);
+    try {
+      const response = await api.post("/auth/register", {
+        name: formData.fullName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim(),
+        pnr: formData.pnr.trim(),
+        password: formData.password,
+      });
+
+      alert(response.message || "Registration successful!");
+
+      setFormData({
+        fullName: "",
+        email: "",
+        phone: "",
+        pnr: "",
+        password: "",
+        confirmPassword: "",
+        userType: "Passenger",
+        terms: false,
+      });
+
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+    } catch (error) {
+      alert(error.message || "Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const benefits = [
@@ -205,7 +237,9 @@ function Register() {
                 {/* PNR */}
 
                 <div className="register-field">
-                  <label>PNR Number</label>
+                  <label>
+                    PNR Number <span>*</span>
+                  </label>
 
                   <div className="register-input-wrapper">
                     <Ticket size={18} />
@@ -213,11 +247,13 @@ function Register() {
                     <input
                       type="text"
                       name="pnr"
-                      placeholder="Enter 10 digit PNR (optional)"
+                      placeholder="Enter 10 digit PNR"
                       value={formData.pnr}
                       onChange={handleChange}
                       maxLength={10}
                       pattern="[0-9]{10}"
+                      inputMode="numeric"
+                      required
                     />
                   </div>
                 </div>
@@ -309,12 +345,7 @@ function Register() {
                     onChange={handleChange}
                     required
                   >
-                    <option value="" disabled>
-                      Select user type
-                    </option>
-
                     <option value="Passenger">Passenger</option>
-                    <option value="Railway Staff">Railway Staff</option>
                   </select>
                 </div>
               </div>
@@ -338,9 +369,13 @@ function Register() {
 
               {/* REGISTER BUTTON */}
 
-              <button type="submit" className="register-submit-btn">
+              <button
+                type="submit"
+                className="register-submit-btn"
+                disabled={isLoading}
+              >
                 <UserPlus size={20} />
-                Register
+                {isLoading ? "Registering..." : "Register"}
               </button>
 
               {/* LOGIN LINK */}

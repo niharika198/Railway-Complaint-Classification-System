@@ -14,29 +14,32 @@ import {
   Bell,
   Send,
   Info,
-  Menu,
 } from "lucide-react";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import api from "../services/api";
 
 import "./SubmitComplaint.css";
 
-function SubmitComplaint() {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    pnr: "",
-    trainNumber: "",
-    journeyDate: "",
-    fromStation: "",
-    toStation: "",
-    description: "",
-  });
+const initialFormData = {
+  fullName: "",
+  email: "",
+  phone: "",
+  pnr: "",
+  trainNumber: "",
+  journeyDate: "",
+  fromStation: "",
+  toStation: "",
+  description: "",
+};
 
+function SubmitComplaint() {
+  const [formData, setFormData] = useState(initialFormData);
   const [submitted, setSubmitted] = useState(false);
   const [complaintId, setComplaintId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,18 +48,65 @@ function SubmitComplaint() {
       ...prev,
       [name]: value,
     }));
+
+    if (errorMessage) {
+      setErrorMessage("");
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const generatedId = "RCC" + Math.floor(100000 + Math.random() * 900000);
+    setErrorMessage("");
 
-    setComplaintId(generatedId);
-    setSubmitted(true);
+    const token =
+      localStorage.getItem("access_token") ||
+      sessionStorage.getItem("access_token");
 
-    // Connect your backend API here later.
-    // Example: POST /api/complaints
+    if (!token) {
+      setErrorMessage(
+        "Your session has expired. Please log in again before submitting.",
+      );
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const response = await api.post(
+        "/complaints/submit",
+        {
+          complaint_text: formData.description.trim(),
+        },
+        token,
+      );
+
+      const actualComplaintId = response?.complaint?.id;
+
+      if (!actualComplaintId) {
+        throw new Error(
+          "Complaint was submitted, but the server did not return a complaint ID.",
+        );
+      }
+
+      setComplaintId(actualComplaintId);
+      setSubmitted(true);
+    } catch (error) {
+      console.error("Complaint submission error:", error);
+
+      setErrorMessage(
+        error.message || "Unable to submit your complaint. Please try again.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmitAnother = () => {
+    setSubmitted(false);
+    setFormData(initialFormData);
+    setComplaintId("");
+    setErrorMessage("");
   };
 
   if (submitted) {
@@ -88,23 +138,7 @@ function SubmitComplaint() {
               complaint.
             </p>
 
-            <button
-              className="rcc-primary-btn"
-              onClick={() => {
-                setSubmitted(false);
-                setFormData({
-                  fullName: "",
-                  email: "",
-                  phone: "",
-                  pnr: "",
-                  trainNumber: "",
-                  journeyDate: "",
-                  fromStation: "",
-                  toStation: "",
-                  description: "",
-                });
-              }}
-            >
+            <button className="rcc-primary-btn" onClick={handleSubmitAnother}>
               Submit Another Complaint
             </button>
 
@@ -121,7 +155,6 @@ function SubmitComplaint() {
 
   return (
     <div className="rcc-page">
-      {/* Existing Navbar */}
       <Navbar />
 
       {/* HERO SECTION */}
@@ -157,6 +190,7 @@ function SubmitComplaint() {
                 <strong>Passenger Information</strong>
                 <span>Tell us about yourself</span>
               </div>
+
               <div className="rcc-step-line"></div>
             </div>
 
@@ -167,6 +201,7 @@ function SubmitComplaint() {
                 <strong>Journey Details</strong>
                 <span>Provide train and travel details</span>
               </div>
+
               <div className="rcc-step-line"></div>
             </div>
 
@@ -177,6 +212,7 @@ function SubmitComplaint() {
                 <strong>Complaint Details</strong>
                 <span>Describe your issue</span>
               </div>
+
               <div className="rcc-step-line"></div>
             </div>
 
@@ -407,10 +443,36 @@ function SubmitComplaint() {
               </div>
             </div>
 
+            {/* ERROR MESSAGE */}
+            {errorMessage && (
+              <div
+                role="alert"
+                style={{
+                  color: "#b42318",
+                  background: "#fef3f2",
+                  border: "1px solid #fecdca",
+                  borderRadius: "8px",
+                  padding: "12px",
+                  marginBottom: "15px",
+                  fontSize: "14px",
+                }}
+              >
+                {errorMessage}
+              </div>
+            )}
+
             {/* SUBMIT */}
-            <button type="submit" className="rcc-submit-btn">
+            <button
+              type="submit"
+              className="rcc-submit-btn"
+              disabled={isLoading}
+              style={{
+                opacity: isLoading ? 0.7 : 1,
+                cursor: isLoading ? "not-allowed" : "pointer",
+              }}
+            >
               <Send size={15} />
-              Submit Complaint
+              {isLoading ? "Submitting..." : "Submit Complaint"}
             </button>
           </form>
         </section>
@@ -507,7 +569,6 @@ function SubmitComplaint() {
         </aside>
       </main>
 
-      {/* Existing Footer */}
       <Footer />
     </div>
   );
